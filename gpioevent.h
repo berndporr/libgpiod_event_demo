@@ -38,7 +38,7 @@ public:
      * Destructor which makes sure the data acquisition
      * stops on exit.
      **/
-    ~GPIOEvent() {
+    ~GPIOPin() {
 	stop();
     }
 
@@ -54,7 +54,7 @@ public:
 	virtual void hasEvent(Event e) = 0;
     };
 
-    void registerCallback(ADSCallbackInterface* ci) {
+    void registerCallback(GPIOEventCallbackInterface* ci) {
 	adsCallbackInterfaces.push_back(ci);
     }
 
@@ -71,7 +71,7 @@ public:
     void stop();
 
 private:
-    void gpioEvent(struct& gpiod_line_event event);
+    void gpioEvent(struct gpiod_line_event event);
 
     void worker();
 

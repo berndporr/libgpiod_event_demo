@@ -30,7 +30,7 @@ void GPIOPin::start(int drdy_chip,
     thr = std::thread(&GPIOPin::worker,this);
 }
 
-void GPIOPin::gpioEvent(struct& gpiod_line_event event) {
+void GPIOPin::gpioEvent(struct gpiod_line_event event) {
 	Event e;
 	switch (gpiod_edge_event_get_event_type(event)) {
 	case GPIOD_EDGE_EVENT_RISING_EDGE:
