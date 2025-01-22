@@ -10,8 +10,10 @@ class EventPrinter : public GPIOPin::GPIOEventCallbackInterface {
 	    switch (e.event_type) {
 	    case GPIOD_LINE_EVENT_RISING_EDGE:
 		printf("Rising!\n");
+		break;
 	    case GPIOD_LINE_EVENT_FALLING_EDGE:
 		printf("Falling\n");
+		break;
 	    default:
 		printf("Unkown event\n");
 	    }
@@ -23,7 +25,8 @@ int main(int argc, char *argv[]) {
 	EventPrinter callbackInterface;
 	GPIOPin gpiopin;
 	gpiopin.registerCallback(&callbackInterface);
-	gpiopin.start();
+	const int gpioPinNo = 27;
+	gpiopin.start(gpioPinNo);
 	getchar();
 	gpiopin.stop();
 	return 0;

@@ -23,13 +23,7 @@
 #define DEBUG
 #endif
 
-#define ISR_TIMEOUT 1000
-
-// default GPIO chip
-#define DEFAULT_CHIP 0
-
-// default GPIO pin for the ALRT/DRY signal
-#define DEFAULT_GPIO 17
+#define ISR_TIMEOUT 1 // sec
 
 class GPIOPin {
 
@@ -58,10 +52,11 @@ public:
 
     /**
      * Starts listening on the GPIO pin.
-     * \param settings A struct with the settings.
+     * \param chipNo GPIO Chip number. It's usually 0.
+     * \param pinNo GPIO Pin number.
      **/
-    void start(int drdy_chip = DEFAULT_CHIP,
-	       int drdy_gpio = DEFAULT_GPIO);
+    void start(int pinNo,
+	       int ChipNo = 0);
 
     /**
      * Stops listening to the pin.
@@ -69,13 +64,13 @@ public:
     void stop();
 
 private:
-    void gpioEvent(struct gpiod_line_event event);
+    void gpioEvent(gpiod_line_event event);
 
     void worker();
 
     // gpiod stuff
-    struct gpiod_chip *chipDRDY = nullptr;
-    struct gpiod_line *pinDRDY = nullptr;
+    gpiod_chip *chipGPIO = nullptr;
+    gpiod_line *pinGPIO = nullptr;
 
     // thread
     std::thread thr;
