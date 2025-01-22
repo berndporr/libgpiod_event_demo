@@ -42,8 +42,6 @@ public:
 	stop();
     }
 
-    enum Event { none, rising, falling };
-
     struct GPIOEventCallbackInterface {
 	    /**
 	     * Called when a new sample is available.
@@ -51,7 +49,7 @@ public:
 	     * class by the client. Defined as abstract.
 	     * \param e If falling or rising.
 	     **/
-	virtual void hasEvent(Event e) = 0;
+	virtual void hasEvent(gpiod_line_event e) = 0;
     };
 
     void registerCallback(GPIOEventCallbackInterface* ci) {

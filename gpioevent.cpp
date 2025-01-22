@@ -30,20 +30,9 @@ void GPIOPin::start(int drdy_chip,
     thr = std::thread(&GPIOPin::worker,this);
 }
 
-void GPIOPin::gpioEvent(struct gpiod_line_event event) {
-	Event e;
-	switch (gpiod_edge_event_get_event_type(event)) {
-	case GPIOD_EDGE_EVENT_RISING_EDGE:
-	    e = rising;
-	    break;
-	case GPIOD_EDGE_EVENT_FALLING_EDGE:
-	    e = falling;
-	    break;
-	default:
-	    e = none;
-	}
+void GPIOPin::gpioEvent(gpiod_line_event event) {
 	for(auto &cb: adsCallbackInterfaces) {
-	    cb->hasADS1115Sample(v);
+	    cb->hasEvent(event);
 	}
 }
 
@@ -54,7 +43,7 @@ void GPIOPin::worker() {
 	gpiod_line_event_wait(pinDRDY, &ts);
 	struct gpiod_line_event event;
 	gpiod_line_event_read(pinDRDY, &event);
-	gpioEvent(e);
+	gpioEvent(event);
     }
 }
 
