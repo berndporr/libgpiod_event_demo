@@ -33,7 +33,7 @@ void GPIOPin::start(int pinNo,
     if (ret < 0) {
 #ifdef DEBUG
 	fprintf(stderr,"Request event notification failed on pin %d and chip %d.\n",
-		settings.drdy_chip,settings.drdy_gpio);
+		pinNo,chipNo);
 #endif
 	throw "Could not request event for IRQ.";
     }
@@ -43,7 +43,7 @@ void GPIOPin::start(int pinNo,
     thr = std::thread(&GPIOPin::worker,this);
 }
 
-void GPIOPin::gpioEvent(gpiod_line_event event) {
+void GPIOPin::gpioEvent(gpiod_line_event& event) {
 	for(auto &cb: adsCallbackInterfaces) {
 	    cb->hasEvent(event);
 	}

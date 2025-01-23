@@ -43,7 +43,7 @@ public:
 	     * class by the client. Defined as abstract.
 	     * \param e If falling or rising.
 	     **/
-	virtual void hasEvent(gpiod_line_event e) = 0;
+	virtual void hasEvent(gpiod_line_event& e) = 0;
     };
 
     void registerCallback(GPIOEventCallbackInterface* ci) {
@@ -64,7 +64,7 @@ public:
     void stop();
 
 private:
-    void gpioEvent(gpiod_line_event event);
+    void gpioEvent(gpiod_line_event& event);
 
     void worker();
 
