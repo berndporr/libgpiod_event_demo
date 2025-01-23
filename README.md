@@ -4,6 +4,13 @@ This wrapper turns the libgpiod event framework into a C++ callback framework.
 This then allows the communication between classes where a class registers
 a callback interface.
 
+## Prerequisites
+
+You need to install the libgpiod development package:
+```
+apt-get install libgpiod-dev
+```
+
 ## How to compile
 
 The build system is `cmake`:
