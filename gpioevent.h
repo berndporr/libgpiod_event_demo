@@ -8,14 +8,16 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation. See the file LICENSE.
  */
-
+#include <gpiod.hpp>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <thread>
-#include <gpiod.h>
+#include <iostream>
+#include <chrono>
+#include <functional>
 #include <vector>
 
 // enable debug messages and error messages to stderr
@@ -23,7 +25,7 @@
 #define DEBUG
 #endif
 
-#define ISR_TIMEOUT 1 // sec
+#define ISR_TIMEOUT_MS 1000 // milisec
 
 class GPIOPin {
 
@@ -43,7 +45,7 @@ public:
 	     * class by the client. Defined as abstract.
 	     * \param e If falling or rising.
 	     **/
-	virtual void hasEvent(gpiod_line_event& e) = 0;
+	virtual void hasEvent(const gpiod::edge_event& e) = 0;
     };
 
     void registerCallback(GPIOEventCallbackInterface* ci) {
@@ -64,19 +66,20 @@ public:
     void stop();
 
 private:
-    void gpioEvent(gpiod_line_event& event);
+    void gpioEvent(const gpiod::edge_event& event);
 
     void worker();
-
-    // gpiod stuff
-    gpiod_chip *chipGPIO = nullptr;
-    gpiod_line *pinGPIO = nullptr;
 
     // thread
     std::thread thr;
 
     // flag that it's running
     bool running = false;
+
+    gpiod::chip chip;
+    gpiod::line_config line_cfg;
+    gpiod::request_config req_cfg;
+    gpiod::line_request request;
 
     std::vector<GPIOEventCallbackInterface*> adsCallbackInterfaces;
 };
