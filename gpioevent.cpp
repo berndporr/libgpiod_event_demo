@@ -27,7 +27,8 @@ void GPIOPin::gpioEvent(const gpiod::edge_event &event)
 
 void GPIOPin::worker()
 {
-	std::string chipPath = std::format("/dev/gpiochip{}", _chipNo);
+	const std::string chipPath = std::format("/dev/gpiochip{}", _chipNo);
+	const std::string consumername = std::format("gpioconsumer_{}_{}", _chipNo, _pinNo);
 
 	// Config the pin as input and detecting falling and rising edegs
 	gpiod::line_config line_cfg;
@@ -70,15 +71,17 @@ void GPIOPin::worker()
 	}
 	catch (const std::exception &e)
 	{
+#ifdef DEBUG	    
 		std::cerr << "Error: " << e.what() << std::endl;
+#endif
+		if (errorCallback) errorCallback(e);
+		// we terminate the thread early
 		return;
 	}
 }
 
 void GPIOPin::stop()
 {
-	if (!running)
-		return;
 	running = false;
-	thr.join();
+	if (thr.joinable()) thr.join();
 }

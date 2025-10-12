@@ -25,7 +25,7 @@
 #define DEBUG
 #endif
 
-#define ISR_TIMEOUT_MS 1000 // milisec
+#define ISR_TIMEOUT_MS 500 // milisec
 
 class GPIOPin {
 
@@ -44,8 +44,23 @@ public:
      **/
     using EventCallback = std::function<void(const gpiod::edge_event&)>;
 
+    /**
+     * Called upon an error in the event loop.
+     **/
+    using ErrorCallback = std::function<void(const std::exception &)>;
+
+    /**
+     * Register callback for an event at the GPIO pin.
+     **/
     void registerCallback(EventCallback ec) {
 	eventCallback = ec;
+    }
+
+    /**
+     * Register callback for an error at the GPIO pin.
+     **/
+    void registerErrorCallback(ErrorCallback ec) {
+	errorCallback = ec;
     }
 
     /**
@@ -76,8 +91,7 @@ private:
     int _chipNo = 0;
 
     EventCallback eventCallback;
-
-    const std::string consumername = "gpioeventconsumer";
+    ErrorCallback errorCallback;
 };
 
 
