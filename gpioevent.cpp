@@ -4,63 +4,87 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-
+#include <format>
 
 void GPIOPin::start(int pinNo,
-		    int chipNo) {
-	
+					int chipNo)
+{
+
 #ifdef DEBUG
-    fprintf(stderr,"Init.\n");
+	fprintf(stderr, "Init.\n");
 #endif
 
-    chip = gpiod::chip("gpiochip0");
+	_pinNo = pinNo;
+	_chipNo = chipNo;
 
-    line_cfg.add_line_settings(
-			       pinNo,
-			       gpiod::line_settings()
-			       .set_direction(gpiod::line::direction::INPUT)
-			       .set_edge_detection(gpiod::line::edge::FALLING)
-			       );
-
-    req_cfg.set_consumer("gpiodemo");
-
-    auto builder = chip.prepare_request();
-    builder.set_request_config(req_cfg);
-    builder.set_line_config(line_cfg);
-    request = builder.do_request();
-    
-    running = true;
-
-    thr = std::thread(&GPIOPin::worker,this);
+	thr = std::thread(&GPIOPin::worker, this);
 }
 
-void GPIOPin::gpioEvent(const gpiod::edge_event& event) {
-	for(auto &cb: adsCallbackInterfaces) {
-	    cb->hasEvent(event);
+void GPIOPin::gpioEvent(const gpiod::edge_event &event)
+{
+	for (auto &cb : adsCallbackInterfaces)
+	{
+		cb->hasEvent(event);
 	}
 }
 
+void GPIOPin::worker()
+{
+	std::string chipPath = std::format("gpiochip{}", _chipNo);
 
-void GPIOPin::worker() {
-    while (running) {
-	bool r = request.wait_edge_events(std::chrono::milliseconds(ISR_TIMEOUT_MS));
-	if (r) {
-	    // callback
-	    gpiod::edge_event_buffer buffer;
-	    request.read_edge_events(buffer,1);
-	    gpioEvent(buffer.get_event(0));
-	} else {
+	// Config the pin as input and detecting falling and rising edegs
+	gpiod::line_config line_cfg;
+	line_cfg.add_line_settings(
+		_pinNo,
+		gpiod::line_settings()
+			.set_direction(gpiod::line::direction::INPUT)
+			.set_edge_detection(gpiod::line::edge::BOTH));
+
+	gpiod::request_config req_cfg;
+	req_cfg.set_consumer("gpiodemo");
+
+	try
+	{
+		gpiod::chip chip(chipPath);
+
+		auto builder = chip.prepare_request();
+		builder.set_request_config(req_cfg);
+		builder.set_line_config(line_cfg);
+		gpiod::line_request request = builder.do_request();
+
+		running = true;
+		while (running)
+		{
+			// blocking I/O: thread goes to sleep till an event has happened.
+			bool r = request.wait_edge_events(std::chrono::milliseconds(ISR_TIMEOUT_MS));
+			if (r)
+			{
+				gpiod::edge_event_buffer buffer;
+				request.read_edge_events(buffer, 1);
+				// callback
+				gpioEvent(buffer.get_event(0));
+			}
+			else
+			{
 #ifdef DEBUG
-	    fprintf(stderr,"Timeout!\n");
+				std::cerr << "Timeout" << std::endl;
 #endif
+			}
+		}
+		request.release();
+		chip.close();
 	}
-    }
-    request.release();
+	catch (const std::exception &e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+		return;
+	}
 }
 
-
-void GPIOPin::stop() {
-    if (!running) return;
-    running = false;
-    thr.join();
+void GPIOPin::stop()
+{
+	if (!running)
+		return;
+	running = false;
+	thr.join();
 }

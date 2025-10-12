@@ -76,10 +76,8 @@ private:
     // flag that it's running
     bool running = false;
 
-    gpiod::chip chip;
-    gpiod::line_config line_cfg;
-    gpiod::request_config req_cfg;
-    gpiod::line_request request;
+    int _pinNo = 0;
+	int _chipNo = 0;
 
     std::vector<GPIOEventCallbackInterface*> adsCallbackInterfaces;
 };

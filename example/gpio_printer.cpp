@@ -6,17 +6,15 @@
 #include "gpioevent.h"
 
 class EventPrinter : public GPIOPin::GPIOEventCallbackInterface {
-	virtual void hasEvent(gpiod::edge_event::event_type& e) override {
-	    switch (e) {
-	    case gpiod::edge_event::event_type::RISING_EDGE:
-		printf("Rising!\n");
-		break;
-	    case gpiod::edge_event::event_type::FALLING_EDGE:
-		printf("Falling\n");
-		break;
-	    default:
-		printf("Unkown event\n");
-	    }
+	virtual void hasEvent(const gpiod::edge_event& e) override {
+	    switch (e.type()) {
+			case gpiod::edge_event::event_type::RISING_EDGE:
+				printf("Rising!\n");
+				break;
+			case gpiod::edge_event::event_type::FALLING_EDGE:
+				printf("Falling\n");
+				break;
+		}
 	}
 };
 
