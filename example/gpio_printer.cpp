@@ -5,14 +5,15 @@
 
 #include "gpioevent.h"
 
-class EventPrinter : public GPIOPin::GPIOEventCallbackInterface {
-	virtual void hasEvent(const gpiod::edge_event& e) override {
+class EventPrinter {
+public:
+    void hasEvent(const gpiod::edge_event& e) {
 	    switch (e.type()) {
 			case gpiod::edge_event::event_type::RISING_EDGE:
 				printf("Rising!\n");
 				break;
 			case gpiod::edge_event::event_type::FALLING_EDGE:
-				printf("Falling\n");
+				printf("Falling.\n");
 				break;
 		}
 	}
@@ -20,9 +21,11 @@ class EventPrinter : public GPIOPin::GPIOEventCallbackInterface {
 
 int main(int argc, char *argv[]) {
 	fprintf(stderr,"Press any key to stop.\n");
-	EventPrinter callbackInterface;
+	EventPrinter eventPrinter;
 	GPIOPin gpiopin;
-	gpiopin.registerCallback(&callbackInterface);
+	gpiopin.registerCallback([&](const gpiod::edge_event& e){
+	    eventPrinter.hasEvent(e);
+	});
 	const int gpioPinNo = 27;
 	gpiopin.start(gpioPinNo);
 	getchar();

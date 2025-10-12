@@ -24,8 +24,10 @@ make install
 ## How to use it?
 
 Please check out the example in the subdir example: `gpio_printer`.
-This detects rising and falling edges on GPIO pin 27. To play with it just
-connect a push button to it.
+This detects rising and falling edges on GPIO pin 27. 
+It registers the method `hasEvent` as a callback in the class `EventPrinter`.
+To play with it just
+connect a push button to GPIO27.
 
 ![alt tag](example/wiring.jpg)
 

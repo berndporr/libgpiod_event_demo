@@ -22,10 +22,7 @@ void GPIOPin::start(int pinNo,
 
 void GPIOPin::gpioEvent(const gpiod::edge_event &event)
 {
-	for (auto &cb : adsCallbackInterfaces)
-	{
-		cb->hasEvent(event);
-	}
+    if (eventCallback) eventCallback(event);
 }
 
 void GPIOPin::worker()
@@ -40,15 +37,12 @@ void GPIOPin::worker()
 			.set_direction(gpiod::line::direction::INPUT)
 			.set_edge_detection(gpiod::line::edge::BOTH));
 
-	gpiod::request_config req_cfg;
-	req_cfg.set_consumer("gpiodemo");
-
 	try
 	{
 		gpiod::chip chip(chipPath);
 
 		auto builder = chip.prepare_request();
-		builder.set_request_config(req_cfg);
+		builder.set_consumer(consumername);
 		builder.set_line_config(line_cfg);
 		gpiod::line_request request = builder.do_request();
 

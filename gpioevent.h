@@ -38,18 +38,14 @@ public:
 	stop();
     }
 
-    struct GPIOEventCallbackInterface {
-	    /**
-	     * Called when a new sample is available.
-	     * This needs to be implemented in a derived
-	     * class by the client. Defined as abstract.
-	     * \param e If falling or rising.
-	     **/
-	virtual void hasEvent(const gpiod::edge_event& e) = 0;
-    };
+    /**
+     * Called after an GPIO event.
+     * The parameter has a reference to the edge event class.
+     **/
+    using EventCallback = std::function<void(const gpiod::edge_event&)>;
 
-    void registerCallback(GPIOEventCallbackInterface* ci) {
-	adsCallbackInterfaces.push_back(ci);
+    void registerCallback(EventCallback ec) {
+	eventCallback = ec;
     }
 
     /**
@@ -77,9 +73,11 @@ private:
     bool running = false;
 
     int _pinNo = 0;
-	int _chipNo = 0;
+    int _chipNo = 0;
 
-    std::vector<GPIOEventCallbackInterface*> adsCallbackInterfaces;
+    EventCallback eventCallback;
+
+    const std::string consumername = "gpioeventconsumer";
 };
 
 
