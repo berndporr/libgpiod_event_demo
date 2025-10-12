@@ -22,7 +22,7 @@ add_library(gpioevent
   )
 
 set_target_properties(gpioevent PROPERTIES
-  SOVERSION 1
+  SOVERSION 2
   PUBLIC_HEADER "${LIBINCLUDE}")
 
 target_link_libraries(gpioevent gpiodcxx)
