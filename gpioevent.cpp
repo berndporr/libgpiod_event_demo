@@ -30,7 +30,7 @@ void GPIOPin::gpioEvent(const gpiod::edge_event &event)
 
 void GPIOPin::worker()
 {
-	std::string chipPath = std::format("gpiochip{}", _chipNo);
+	std::string chipPath = std::format("/dev/gpiochip{}", _chipNo);
 
 	// Config the pin as input and detecting falling and rising edegs
 	gpiod::line_config line_cfg;
