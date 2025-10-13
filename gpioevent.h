@@ -9,16 +9,10 @@
  * the Free Software Foundation. See the file LICENSE.
  */
 #include <gpiod.hpp>
-#include <stdint.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 #include <thread>
 #include <iostream>
 #include <chrono>
 #include <functional>
-#include <vector>
 
 // enable debug messages and error messages to stderr
 #ifndef NDEBUG
