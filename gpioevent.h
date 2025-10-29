@@ -51,13 +51,6 @@ public:
     }
 
     /**
-     * Register callback for an error at the GPIO pin.
-     **/
-    void registerErrorCallback(ErrorCallback ec) {
-	errorCallback = ec;
-    }
-
-    /**
      * Starts listening on the GPIO pin.
      * \param chipNo GPIO Chip number. It's usually 0.
      * \param pinNo GPIO Pin number.
@@ -81,11 +74,10 @@ private:
     // flag that it's running
     bool running = false;
 
-    int _pinNo = 0;
-    int _chipNo = 0;
+    std::shared_ptr<gpiod::chip> chip;
+    std::shared_ptr<gpiod::line_request> request;
 
     EventCallback eventCallback;
-    ErrorCallback errorCallback;
 };
 
 
