@@ -59,4 +59,4 @@ See the `CMakeLists.txt` in the example folder.
 
 ## Credit
 
-Bernd Porr
+Bernd Porr, bernd.porr@glasgow.ac.uk
